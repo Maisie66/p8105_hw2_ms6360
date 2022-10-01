@@ -119,12 +119,10 @@ prof_trash_wheel =
   skip = 1) %>%
 janitor::clean_names() %>%
   drop_na(dumpster) %>%
-  mutate(sports_balls = as.integer(round(sports_balls, 0)))
-  prof_trash_wheel$name = "Professor Trash Wheel" %>%
-
-#convert dumpster from Professor Trash Wheel into character to join datasets
-prof_trash_wheel$dumpster <- as.character(prof_trash_wheel$dumpster)  
-
+  mutate(sports_balls = as.integer(round(sports_balls, 0))) %>%
+  add_column(name = "Professor Trash Wheel") %>%
+  mutate(dumpster = as.character(dumpster))
+  
 #fully join datasets
 joint_trash_wheel = 
   full_join(trash_wheel, prof_trash_wheel)
@@ -133,3 +131,8 @@ joint_trash_wheel
 
 ```
 
+Write a paragraph about these data; you are encouraged to use inline R. Be sure to note the number of observations in the resulting dataset, and give examples of key variables. For available data, what was the total weight of trash collected by Professor Trash Wheel? What was the total number of sports balls collected by Mr. Trash Wheel in 2020?
+
+For Mr. Trash Wheel dataset, there are `r ncol(trash_wheel)` columns (variables) and `r nrow(trash_wheel)` rows (observations). As for Professor Trash Wheel, there are `r ncol(prof_trash_wheel)` columns (variables) and `r nrow(prof_trash_wheel)` rows (observations). Once combined, there are `r ncol(joint_trash_wheel)` columns (variables) and `r nrow(joint_trash_wheel)` rows (observations). Variables in this dataset include `r colnames(joint_trash_wheel)`. Within these variables, the weight of trash collected in tons, number of trash collected (plastic bottles, polystyrene, cigarette butts, grocery bags, glass bottles, chip bags, and sports balls), and time of trash collection were detailed.
+
+The total weight of trash collected by Professor Trash Wheel is `r sum(prof_trash_wheel$weight_tons)`. `r sum(trash_wheel$sports_balls) %>% sum(trash_wheel$sports_balls))`
