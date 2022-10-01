@@ -100,6 +100,7 @@ NYC_transit %>%
 # Problem 2
 
 ```{r excel_import}
+#import Mr. Trash Wheel
 trash_wheel = 
   read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",
   sheet = "Mr. Trash Wheel",
@@ -110,6 +111,7 @@ janitor::clean_names() %>%
   mutate(sports_balls = as.integer(round(sports_balls, 0)))
   trash_wheel$name <- "Mr.Trash Wheel"
 
+#import Professor Trash Wheel
 prof_trash_wheel = 
   read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",
   sheet = "Professor Trash Wheel",
@@ -118,15 +120,16 @@ prof_trash_wheel =
 janitor::clean_names() %>%
   drop_na(dumpster) %>%
   mutate(sports_balls = as.integer(round(sports_balls, 0)))
-  prof_trash_wheel$name = "Professor Trash Wheel"
+  prof_trash_wheel$name = "Professor Trash Wheel" %>%
 
+#convert dumpster from Professor Trash Wheel into character to join datasets
 prof_trash_wheel$dumpster <- as.character(prof_trash_wheel$dumpster)  
 
+#fully join datasets
 joint_trash_wheel = 
   full_join(trash_wheel, prof_trash_wheel)
 
 joint_trash_wheel
-
 
 ```
 
