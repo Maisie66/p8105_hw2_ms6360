@@ -1,0 +1,97 @@
+---
+title: "p8105_hw2_ms6360"
+author: "Maisie Sun"
+date: "2022-10-01"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+# Problem 1
+
+```{r data _import}
+NYC_transit = 
+  read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
+  janitor::clean_names() %>%
+  select(line, station_name, station_latitude, starts_with('route'), entry, vending, entrance_type, ada) %>% 
+  mutate(entry = ifelse(entry == "YES",TRUE,FALSE))
+
+NYC_transit
+
+```
+
+* The dataset contains variables station names, station latitude, different routes (1 to 11), entry, vending, entrance times and ADA. 
+
+* There are `r ncol(NYC_transit)` columns (variables) and `r nrow(NYC_transit)` rows (observations). 
+
+* The data is not tidy and can be improved by having routes as cell number under a variable called "Routes" instead of having different routes as its own variables.
+
+Answer the following questions using these data:
+
+How many distinct stations are there? Note that stations are identified both by name and by line (e.g. 125th St 8th Avenue; 125st Broadway; 125st Lenox); the `distinct` function may be useful here.
+
+```{r distinct_stations}
+NYC_transit %>%
+  select(line, station_name) %>%
+  distinct
+```
+
+* There are `r nrow(distinct(NYC_transit, line, station_name))` distinct stations.
+
+How many stations are ADA compliant?
+
+```{r ADA_compliant_stations}
+NYC_transit %>%
+  filter(ada == TRUE) %>%
+  select(line, station_name) %>%
+  distinct
+```
+
+* There are 84 stations that are ADA compliant.
+
+What proportion of station entrances / exits without vending allow entrance?
+
+```{r proportion_stations_vending}
+NYC_transit %>%
+  filter(vending == "NO") %>%
+  pull(entry) %>%
+  mean
+```
+
+* 0.377 of station entrances without vending allow entrance.
+
+Reformat data so that route number and route name are distinct variables. How many distinct stations serve the A train? Of the stations that serve the A train, how many are ADA compliant?
+
+```{r station_A_trains}
+NYC_transit
+
+# specify the columns I want to change
+NYC_transit$route8 <- as.character(NYC_transit$route8)  
+NYC_transit$route9 <- as.character(NYC_transit$route9)  
+NYC_transit$route10 <- as.character(NYC_transit$route10)  
+NYC_transit$route11 <- as.character(NYC_transit$route11)  
+
+NYC_transit %>%
+  pivot_longer(
+    route1:route11,
+    names_to = "route_num",
+    values_to = "route") %>%
+  filter(route == "A") %>%
+  select(line, station_name) %>%
+  distinct
+
+
+NYC_transit %>%
+  pivot_longer(
+    route1:route11,
+    names_to = "route_num",
+    values_to = "route") %>%
+  filter(route == "A", ada == "TRUE") %>%
+  select(line, station_name) %>%
+  distinct
+```
+
+* There are 60 distinct stations on line A and 17 of them are ADA compliant.
