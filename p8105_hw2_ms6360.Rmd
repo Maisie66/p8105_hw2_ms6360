@@ -8,6 +8,7 @@ output: github_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(readxl)
 ```
 
 # Problem 1
@@ -95,3 +96,18 @@ NYC_transit %>%
 ```
 
 * There are 60 distinct stations on line A and 17 of them are ADA compliant.
+
+# Problem 2
+
+```{r excel_import}
+trash_wheel = 
+  read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",
+  sheet = "Mr. Trash Wheel",
+  range = "A2:N535",
+  skip = 1) %>%
+janitor::clean_names() %>%
+  drop_na(dumpster) %>%
+  mutate(sports_balls = as.integer(round(sports_balls, 0)))
+
+```
+
