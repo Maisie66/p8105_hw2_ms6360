@@ -99,7 +99,7 @@ NYC_transit %>%
 trash_wheel = 
   read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",
   sheet = "Mr. Trash Wheel",
-  range = "A2:N535",
+  range = "A2:O535",
   skip = 1) %>%
 janitor::clean_names() %>%
   drop_na(dumpster) %>%
@@ -137,8 +137,10 @@ pols_months =
   mutate(month = month.abb[as.numeric(month)]) %>%
   pivot_longer( 
     cols = starts_with("prez_"),
-    values_to = "president") %>%
-  select(-name,-day) %>%
+    names_to = "president",
+    names_prefix = "prez_",
+    values_to = "number") %>%
+  select(-day) %>%
   mutate(year = as.double(year))
 ```
 
@@ -177,3 +179,8 @@ pols_snp_unemployment =
   full_join(pols_snp, unemployment)
 ```
 
+In the `pols_month` dataset, there are `r nrow(pols_months)` rows (observations) and `r ncol(pols_months)` columns (variables). The range of years is (`r range(pols_months$year)`). Variables in this dataset (`r colnames(pols_months)`) include the number of republican and democratic presidents, governors, senators, and representatives.
+
+For the `snp` dataset, there are `r nrow(snp)` rows (observations) and `r ncol(snp)` columns (variables). The range of years is (`r range(snp$year)`). Variables in this dataset (`r colnames(snp)`) include the closing values of the S&P stock index on the associated month
+
+Finally for the `unemployment` dataset, there are `r nrow(unemployment)` rows (observations) and `r ncol(unemployment)` columns (variables).The range of years is (`r range(unemployment$year)`). Variables in this dataset (`r colnames(unemployment)`) include represents the percentage of unemployment associated with the month.
