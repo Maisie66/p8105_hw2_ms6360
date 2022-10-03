@@ -19,9 +19,6 @@ NYC_transit =
   janitor::clean_names() %>%
   select(line, station_name, station_latitude, starts_with('route'), entry, vending, entrance_type, ada) %>% 
   mutate(entry = ifelse(entry == "YES",TRUE,FALSE))
-
-NYC_transit
-
 ```
 
 * The dataset contains variables station names, station latitude, different routes (1 to 11), entry, vending, entrance times and ADA. 
@@ -67,9 +64,7 @@ NYC_transit %>%
 Reformat data so that route number and route name are distinct variables. How many distinct stations serve the A train? Of the stations that serve the A train, how many are ADA compliant?
 
 ```{r station_A_trains}
-NYC_transit
-
-# specify the columns I want to change
+# change column type from double to character
 NYC_transit$route8 <- as.character(NYC_transit$route8)  
 NYC_transit$route9 <- as.character(NYC_transit$route9)  
 NYC_transit$route10 <- as.character(NYC_transit$route10)  
@@ -99,7 +94,7 @@ NYC_transit %>%
 
 # Problem 2
 
-```{r excel_import}
+```{r excel_import_joining}
 #import Mr. Trash Wheel
 trash_wheel = 
   read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",
@@ -126,15 +121,60 @@ janitor::clean_names() %>%
 #fully join datasets
 joint_trash_wheel = 
   full_join(trash_wheel, prof_trash_wheel)
-
-joint_trash_wheel
-
 ```
-
-Write a paragraph about these data; you are encouraged to use inline R. Be sure to note the number of observations in the resulting dataset, and give examples of key variables. For available data, what was the total weight of trash collected by Professor Trash Wheel? What was the total number of sports balls collected by Mr. Trash Wheel in 2020?
 
 For Mr. Trash Wheel dataset, there are `r ncol(trash_wheel)` columns (variables) and `r nrow(trash_wheel)` rows (observations). As for Professor Trash Wheel, there are `r ncol(prof_trash_wheel)` columns (variables) and `r nrow(prof_trash_wheel)` rows (observations). Once combined, there are `r ncol(joint_trash_wheel)` columns (variables) and `r nrow(joint_trash_wheel)` rows (observations). Variables in this dataset include `r colnames(joint_trash_wheel)`. Within these variables, the weight of trash collected in tons, number of trash collected (plastic bottles, polystyrene, cigarette butts, grocery bags, glass bottles, chip bags, and sports balls), and time of trash collection were detailed.
 
-The total weight of trash collected by Professor Trash Wheel is `r sum(prof_trash_wheel$weight_tons)`. `r sum(trash_wheel$sports_balls) %>% sum(trash_wheel$sports_balls))`
+The total weight of trash collected by Professor Trash Wheel is `r sum(prof_trash_wheel$weight_tons)`. The total number of sports balls collected by Mr. Trash Wheel in 2020 is `r  trash_wheel %>% filter(year == "2020") %>% pull(sports_balls) %>% sum()`.
 
 # Problem 3
+
+```{r pols_months}
+pols_months = 
+  read_csv("./data/data3/pols-month.csv") %>%
+  janitor::clean_names() %>%
+  separate(mon, into = c("year", "month", "day"), sep = "-") %>%
+  mutate(month = month.name[as.numeric(month)]) %>%
+  pivot_longer( 
+    cols = starts_with("prez_"),
+    values_to = "president") %>%
+  select(-name,-day) %>%
+  mutate(year = as.double(year))
+```
+
+```{r snp}
+snp = 
+  read_csv("./data/data3/snp.csv") %>%
+  janitor::clean_names()
+  
+snp_after_01 <- filter(snp, row_number() < 176) %>%
+  mutate(date = as.Date(date,"%y/%m/%d")) %>%
+  separate(date, into = c("year", "month", "day"), sep = "-")
+
+snp_before_01 <- filter(snp, row_number() > 175) %>%
+  mutate(date = as.Date(date,"%m/%d/%y")) %>%
+  separate(date, into = c("year", "month", "day"), sep = "-")
+
+snp = 
+  full_join(snp_after_01, snp_before_01) %>%
+  mutate(month = month.name[as.numeric(month)]) %>%
+  select(-day) %>%
+  mutate(year = as.double(year))
+```
+
+```{r unemployment}
+unemployment = 
+  read_csv("./data/data3/unemployment.csv") %>%
+  janitor::clean_names() %>%
+   pivot_longer( 
+     cols = jan:dec,
+     names_to = "month",
+     values_to = "percent_unemployment") %>%
+  mutate(month = recode(month, jan = "January", feb = "Februrary", mar = "March", apr = "April", may = "May", jun = "June", jul = "July", aug = "August", sep = "September", oct = "October", nov = "November", dec = "December"))
+
+pols_snp = 
+  full_join(pols_months, snp)
+pols_snp_unemployment = 
+  full_join(pols_snp, unemployment)
+```
+
