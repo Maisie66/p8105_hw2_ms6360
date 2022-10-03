@@ -134,7 +134,7 @@ pols_months =
   read_csv("./data/data3/pols-month.csv") %>%
   janitor::clean_names() %>%
   separate(mon, into = c("year", "month", "day"), sep = "-") %>%
-  mutate(month = month.name[as.numeric(month)]) %>%
+  mutate(month = month.abb[as.numeric(month)]) %>%
   pivot_longer( 
     cols = starts_with("prez_"),
     values_to = "president") %>%
@@ -157,7 +157,7 @@ snp_before_01 <- filter(snp, row_number() > 175) %>%
 
 snp = 
   full_join(snp_after_01, snp_before_01) %>%
-  mutate(month = month.name[as.numeric(month)]) %>%
+  mutate(month = month.abb[as.numeric(month)]) %>%
   select(-day) %>%
   mutate(year = as.double(year))
 ```
@@ -169,8 +169,7 @@ unemployment =
    pivot_longer( 
      cols = jan:dec,
      names_to = "month",
-     values_to = "percent_unemployment") %>%
-  mutate(month = recode(month, jan = "January", feb = "Februrary", mar = "March", apr = "April", may = "May", jun = "June", jul = "July", aug = "August", sep = "September", oct = "October", nov = "November", dec = "December"))
+     values_to = "percent_unemployment")
 
 pols_snp = 
   full_join(pols_months, snp)
