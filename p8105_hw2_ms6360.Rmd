@@ -99,7 +99,7 @@ NYC_transit %>%
 trash_wheel = 
   read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",
   sheet = "Mr. Trash Wheel",
-  range = "A2:O535",
+  range = "A2:N535",
   skip = 1) %>%
 janitor::clean_names() %>%
   drop_na(dumpster) %>%
