@@ -179,7 +179,7 @@ pols_snp_unemployment =
   full_join(pols_snp, unemployment)
 ```
 
-In the `pols_month` dataset, there are `r nrow(pols_months)` rows (observations) and `r ncol(pols_months)` columns (variables). The range of years is (`r range(pols_months$year)`). Variables in this dataset (`r colnames(pols_months)`) include the number of republican and democratic presidents, governors, senators, and representatives.
+In the `pols_month` dataset, there are `r nrow(pols_months)` rows (observations) and `r ncol(pols_months)` columns (variables). The range of years is (`r range(pols_months$year)`). Variables in this dataset (`r colnames(pols_months)`) include the number of republican and democratic presidents, governors, senators, and representatives. One note to make is that for prez_gop, under the year 1974, there were 2 Republican presidents being Richard Nixon and Gerald Ford.
 
 For the `snp` dataset, there are `r nrow(snp)` rows (observations) and `r ncol(snp)` columns (variables). The range of years is (`r range(snp$year)`). Variables in this dataset (`r colnames(snp)`) include the closing values of the S&P stock index on the associated month
 
