@@ -95,10 +95,11 @@ NYC_transit %>%
 
 ## Problem 2
 
+Step 1: Import Mr. Trash Wheel and clean the data
+
 ```{r excel_import_joining}
-#import Mr. Trash Wheel
 trash_wheel = 
-  read_excel("data/Trash Wheel Collection Data.xlsx",
+  read_excel("./data/Trash Wheel Collection Data.xlsx",
   sheet = "Mr. Trash Wheel",
   range = "A2:N550",
   skip = 1) %>%
@@ -106,12 +107,12 @@ janitor::clean_names() %>%
   drop_na(dumpster) %>%
   mutate(sports_balls = as.integer(round(sports_balls, 0)))
   trash_wheel$name <- "Mr.Trash Wheel"
-  
-  trash_wheel
+```
 
-#import Professor Trash Wheel
+Step 2: Import Professor Trash Wheel and clean the data
+```{r}
 prof_trash_wheel = 
-  read_excel("data/Trash Wheel Collection Data.xlsx",
+  read_excel("./data/Trash Wheel Collection Data.xlsx",
   sheet = "Professor Trash Wheel",
   range = "A2:M97",
   skip = 1) %>%
@@ -120,8 +121,10 @@ janitor::clean_names() %>%
   mutate(dumpster = as.double(dumpster)) %>%
   mutate(year = as.character(year))
   prof_trash_wheel$name <- "Professor Trash Wheel"
-  
-#fully join datasets
+```
+
+Step 3: Perform `full_join` to combine datasets
+```{r}
 joint_trash_wheel = 
   full_join(trash_wheel, prof_trash_wheel)
 ```
@@ -143,7 +146,8 @@ pols_months =
     names_to = "president",
     names_prefix = "prez_",
     values_to = "number") %>%
-  select(-day) %>%
+  filter(!(number == "0")) %>%
+  select(-day, -number) %>%
   mutate(year = as.double(year))
 ```
 
@@ -152,19 +156,22 @@ snp =
   read_csv("./data/data3/snp.csv") %>%
   janitor::clean_names()
   
-snp_after_01 <- filter(snp, row_number() < 176) %>%
-  mutate(date = as.Date(date,"%y/%m/%d")) %>%
-  separate(date, into = c("year", "month", "day"), sep = "-")
-
-snp_before_01 <- filter(snp, row_number() > 175) %>%
-  mutate(date = as.Date(date,"%m/%d/%y")) %>%
-  separate(date, into = c("year", "month", "day"), sep = "-")
-
-snp = 
-  full_join(snp_after_01, snp_before_01) %>%
+snp_after_00 <- filter(snp, row_number() < 176) %>%
+  separate(date, into = c("month", "day", "year"), sep = "/") %>%
+  mutate(year = as.integer(year)) %>%
+  mutate(year = year + 2000) %>%
+  mutate(month = month.abb[as.numeric(month)])
+  
+snp_before_00 <- filter(snp, row_number() > 175) %>%
+  separate(date, into = c("month", "day", "year"), sep = "/") %>%
+  mutate(year = as.numeric(year)) %>%
+  mutate(year = ifelse((year > 0), year + 1900, year + 2000)) %>%
   mutate(month = month.abb[as.numeric(month)]) %>%
-  select(-day) %>%
-  mutate(year = as.double(year))
+  select(year, month, everything())
+
+snp_final = 
+  full_join(snp_after_00, snp_before_00) %>%
+  select(-day)
 ```
 
 ```{r unemployment}
@@ -177,14 +184,14 @@ unemployment =
      values_to = "percent_unemployment")
 
 pols_snp = 
-  full_join(pols_months, snp)
+  left_join(pols_months, snp_final)
 pols_snp_unemployment = 
-  full_join(pols_snp, unemployment)
+  left_join(pols_snp, unemployment)
 ```
 
 In the `pols_month` dataset, there are `r nrow(pols_months)` rows (observations) and `r ncol(pols_months)` columns (variables). The range of years is (`r range(pols_months$year)`). Variables in this dataset (`r colnames(pols_months)`) include the number of republican and democratic presidents, governors, senators, and representatives. One note to make is that for prez_gop, under the year 1974, there were 2 Republican presidents being Richard Nixon and Gerald Ford.
 
-For the `snp` dataset, there are `r nrow(snp)` rows (observations) and `r ncol(snp)` columns (variables). The range of years is (`r range(snp$year)`). Variables in this dataset (`r colnames(snp)`) include the closing values of the S&P stock index on the associated month
+For the `snp` dataset, there are `r nrow(snp_final)` rows (observations) and `r ncol(snp_final)` columns (variables). The range of years is (`r range(snp_final$year)`). Variables in this dataset (`r colnames(snp_final)`) include the closing values of the S&P stock index on the associated month
 
 In the `unemployment` dataset, there are `r nrow(unemployment)` rows (observations) and `r ncol(unemployment)` columns (variables).The range of years is (`r range(unemployment$year)`). Variables in this dataset (`r colnames(unemployment)`) include represents the percentage of unemployment associated with the month.
 
