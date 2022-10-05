@@ -4,6 +4,7 @@ author: "Maisie Sun"
 date: "2022-10-01"
 output: github_document
 ---
+# Homework 2
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -11,7 +12,7 @@ library(tidyverse)
 library(readxl)
 ```
 
-# Problem 1
+## Problem 1
 
 ```{r data _import}
 NYC_transit = 
@@ -92,7 +93,7 @@ NYC_transit %>%
 
 * There are 60 distinct stations on line A and 17 of them are ADA compliant.
 
-# Problem 2
+## Problem 2
 
 ```{r excel_import_joining}
 #import Mr. Trash Wheel
@@ -129,7 +130,7 @@ For Mr. Trash Wheel dataset, there are `r ncol(trash_wheel)` columns (variables)
 
 The total weight of trash collected by Professor Trash Wheel is `r sum(prof_trash_wheel$weight_tons)` tons. The total number of sports balls collected by Mr. Trash Wheel in 2020 is `r  trash_wheel %>% filter(year == "2020") %>% pull(sports_balls) %>% sum()`.
 
-# Problem 3
+## Problem 3
 
 ```{r pols_months}
 pols_months = 
@@ -185,4 +186,6 @@ In the `pols_month` dataset, there are `r nrow(pols_months)` rows (observations)
 
 For the `snp` dataset, there are `r nrow(snp)` rows (observations) and `r ncol(snp)` columns (variables). The range of years is (`r range(snp$year)`). Variables in this dataset (`r colnames(snp)`) include the closing values of the S&P stock index on the associated month
 
-Finally for the `unemployment` dataset, there are `r nrow(unemployment)` rows (observations) and `r ncol(unemployment)` columns (variables).The range of years is (`r range(unemployment$year)`). Variables in this dataset (`r colnames(unemployment)`) include represents the percentage of unemployment associated with the month.
+In the `unemployment` dataset, there are `r nrow(unemployment)` rows (observations) and `r ncol(unemployment)` columns (variables).The range of years is (`r range(unemployment$year)`). Variables in this dataset (`r colnames(unemployment)`) include represents the percentage of unemployment associated with the month.
+
+Finally, in the combined dataset `pols_snp_unemployment`, there are `r nrow(pols_snp_unemployment)` rows (observations) and `r ncol(pols_snp_unemployment)` columns (variables). The range of years is (`r range(pols_snp_unemployment$year)`). Variables in this dataset (`r colnames(pols_snp_unemployment)`) include all variables from the previous datasets.
